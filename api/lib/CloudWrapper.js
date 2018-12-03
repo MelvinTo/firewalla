@@ -28,7 +28,7 @@ var configFileLocation = "/encipher.config/netbot.config";
 
 var config = jsonfile.readFileSync(configFileLocation);
 if (config == null) {
-  console.log("Unable to read config file");
+  console.log("Unable to read config file", configFileLocation);
   process.exit(1);
 }
 
@@ -132,6 +132,7 @@ module.exports = class {
               if(nbControllers[groupID]) {
                 return;
               }
+              rclient.setAsync("groupName", group.name);              
               let NetBotController = require("../../controllers/netbot.js");
               let nbConfig = jsonfile.readFileSync(fHome + "/controllers/netbot.json", 'utf8');
               nbConfig.controller = config.controllers[0];

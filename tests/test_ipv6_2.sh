@@ -16,8 +16,8 @@ fi
 
 # return error if ipv6 service is not online
 if ! systemctl is-active bitbridge6; then
-  curl https://diag.firewalla.com/setup/ipv6/${EID}/match12340
+  curl https://diag.firewalla.com/setup/ipv6/${EID}/match123400
   sudo systemctl restart bitbridge6
 else
-  curl https://diag.firewalla.com/setup/ipv6/${EID}/match56780
+  curl https://diag.firewalla.com/setup/ipv6/${EID}/match567800
 fi

@@ -11,6 +11,6 @@ DIFF=$(( $NOW - $LAST_CONN_TS ))
 
 EID=$(redis-cli hget sys:ept eid)
 
-if [[ $DIFF -gt 3600 ]]; then
+if [[ $DIFF -gt 1800 ]]; then
   curl https://diag.firewalla.com/setup/bro/${EID}/$DIFF
 fi

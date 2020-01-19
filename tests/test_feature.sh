@@ -15,8 +15,7 @@ fi
 redis-cli hset sys:features $FEATURE_NAME $EXPECT_TARGET
 if [[ $EXPECT_TARGET -eq 1 ]]; then
   redis-cli publish "config:feature:dynamic:enable" "$FEATURE_NAME"
-  curl https://diag.firewalla.com/setup/feature/${EID}/${FEATURE_NAME}/on &> /dev/null
 elsif [[ $EXPECT_TARGET -eq 0 ]]; then
   redis-cli publish "config:feature:dynamic:disable" "$FEATURE_NAME"
-  curl https://diag.firewalla.com/setup/feature/${EID}/${FEATURE_NAME}/off &> /dev/null
 fi
+curl https://diag.firewalla.com/setup/feature/${EID}/${FEATURE_NAME}/${EXPECT_TARGET} &> /dev/null

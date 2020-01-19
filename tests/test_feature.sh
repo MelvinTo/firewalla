@@ -12,10 +12,13 @@ if [[ $ACTUAL_TARGET == $EXPECT_TARGET ]]; then
 fi
 
 
-redis-cli hset sys:features $FEATURE_NAME $EXPECT_TARGET
+
 if [[ $EXPECT_TARGET -eq 1 ]]; then
+  redis-cli hset sys:features $FEATURE_NAME $EXPECT_TARGET
   redis-cli publish "config:feature:dynamic:enable" "$FEATURE_NAME"
-elsif [[ $EXPECT_TARGET -eq 0 ]]; then
+elif [[ $EXPECT_TARGET -eq 0 ]]; then
+  redis-cli hset sys:features $FEATURE_NAME $EXPECT_TARGET
   redis-cli publish "config:feature:dynamic:disable" "$FEATURE_NAME"
 fi
+
 curl https://diag.firewalla.com/setup/feature/${EID}/${FEATURE_NAME}/${EXPECT_TARGET} &> /dev/null

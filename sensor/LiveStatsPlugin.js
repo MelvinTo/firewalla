@@ -35,6 +35,8 @@ const exec = require('child-process-promise').exec;
 
 const sysManager = require('../net2/SysManager.js');
 
+const _ = require('lodash');
+
 
 class LiveStatsPlugin extends Sensor {
 
@@ -57,9 +59,46 @@ class LiveStatsPlugin extends Sensor {
     for(const id in this.streamingCache) {
       const cache = this.streamingCache[id];
       if(cache.ts < Math.floor(new Date() / 1000) - 1800) {
-        delete this.streamingCache[id]
+        delete this.streamingCache[id];
       }
     }
+    if(_.isEmpty(this.streamingCache)) {
+      this.clearRecordJobTimer();
+    }
+  }
+
+  async recordJob() {
+    if (!_.isEmpty(streamingCache)) {
+      const intfStats = [];
+      const interval = 500; // 500ms
+      const intfs = fireRouter.getLogicIntfNames();
+      const promises = intfs.map( async (intf) => {
+        const rate = await this.getRate(intf);
+        rate.tx = Math.floor(rate.tx * 1000 / interval); // in seconds
+        rate.rx = Math.floor(rate.rx * 1000 / interval); // in seconds
+        intfStats.push(rate);
+      });
+      promises.push(delay(interval)); // at least wait for interval seconds
+      await Promise.all(promises);
+      this.lastIntfStats = intfStats;
+      this.lastIntfStatsTimestamp = Math.floor(Date.now() / 1);
+    }
+  }
+
+  clearRecordJobTimer() {
+    if(this.jobTimer) {
+      clearInterval(this.jobTimer);
+      this.jobTimer = null;
+    }
+  }
+  
+  launchRecordJobTimer() {
+    // clear before launch
+    this.clearRecordJobTimer();
+
+    this.jobTimer = setInterval(() => {
+      this.recordJob();
+    }, 50); // 50 ms
   }
 
   lastFlowTS(flows) { // flows must be in asc order
@@ -74,7 +113,7 @@ class LiveStatsPlugin extends Sensor {
     this.streamingCache = {};
 
     setInterval(() => {
-      this.cleanupStreaming()
+      this.cleanupStreaming();
     }, 600 * 1000); // cleanup every 10 mins
 
     this.timer = setInterval(async () => {
@@ -85,36 +124,47 @@ class LiveStatsPlugin extends Sensor {
       const streaming = data.streaming;
       const id = streaming.id;
       this.registerStreaming(streaming);
+      this.launchRecordJobTimer();
 
-      let lastTS = this.lastStreamingTS(id);
+      const containFlows = data.flows || true;
+      const containIntfStats = data.intfs || true;
+
       const now = Math.floor(new Date() / 1000);
+      
       let flows = [];
 
-      if(!lastTS) {
-        const prevFlows = (await this.getPreviousFlows()).reverse();
-        flows.push.apply(flows, prevFlows);
-        lastTS = this.lastFlowTS(prevFlows) && now;
-      } else {
-        if (lastTS < now - 60) {
-          lastTS = now - 60; // self protection, ignore very old ts
+      if (containFlows) {
+        let lastTS = this.lastStreamingTS(id);
+        if(!lastTS) {
+          const prevFlows = (await this.getPreviousFlows()).reverse();
+          flows.push.apply(flows, prevFlows);
+          lastTS = this.lastFlowTS(prevFlows) && now;
+        } else {
+          if (lastTS < now - 60) {
+            lastTS = now - 60; // self protection, ignore very old ts
+          }
         }
+
+        const newFlows = await this.getFlows(lastTS);
+        flows.push.apply(flows, newFlows);
+
+        let newFlowTS = this.lastFlowTS(newFlows) || lastTS;
+        this.updateStreamingTS(id, newFlowTS);
       }
 
-      const newFlows = await this.getFlows(lastTS);
-      flows.push.apply(flows, newFlows);
+      let intfStats = [];
+      
+      if(containIntfStats) {
+        if(this.lastIntfStats && this.lastIntfStatsTimestamp > Math.floor(new Date() / 1) - 5000) { // within 5 seconds, consider as valid
+        } else {
+          // recalculate
+          await this.recordJob();
+        }
 
-      let newFlowTS = this.lastFlowTS(newFlows) || lastTS;
-      this.updateStreamingTS(id, newFlowTS);
+        intfStats = this.lastIntfStats;
+      }
 
-      const intfs = fireRouter.getLogicIntfNames();
-      const intfStats = [];
-      const promises = intfs.map( async (intf) => {
-        const rate = await this.getRate(intf);
-        intfStats.push(rate);
-      });
-      promises.push(delay(1000)); // at least wait for 1 sec
-      await Promise.all(promises);
-      return {flows, intfStats, activeConn: this.activeConnCount};
+      return {ts: now, flows, intfStats, activeConn: this.activeConnCount};
     });
   }
 
@@ -124,9 +174,10 @@ class LiveStatsPlugin extends Sensor {
     return {rx, tx};
   }
 
-  async getRate(intf) {
+  // return number of bytes transferred during the interval
+  async getRate(intf, interval = 1000) {
     const s1 = await this.getIntfStats(intf);
-    await delay(1000);
+    await delay(interval);
     const s2 = await this.getIntfStats(intf);
     return {
       name: intf,

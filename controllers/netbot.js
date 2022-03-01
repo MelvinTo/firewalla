@@ -1804,12 +1804,16 @@ class netBot extends ControllerBot {
           this.simpleTxData(msg, {}, { code: 400, msg: `Unsupported VPN client type: ${type}` });
           return;
         }
-        const vpnClient = new c({profileId});
         (async () => {
-          const exists = await vpnClient.profileExists();
-          if (!exists) {
-            this.simpleTxData(msg, {}, { code: 404, msg: "Specified profileId is not found." }, callback);
-            return;
+          // backward compatibility in case api call payload does not contain type, directly use singleton in VPNClient.js based on profileId if available
+          let vpnClient = VPNClient.getInstance(profileId);
+          if (!vpnClient) {
+            const exists = await c.profileExists(profileId);
+            if (!exists) {
+              this.simpleTxData(msg, {}, { code: 404, msg: "Specified profileId is not found." }, callback);
+              return;
+            }
+            vpnClient = new c({ profileId });
           }
           const attributes = await vpnClient.getAttributes(true);
           this.simpleTxData(msg, attributes, null, callback);
@@ -1830,8 +1834,8 @@ class netBot extends ControllerBot {
           for (let type of types) {
             const c = VPNClient.getClass(type);
             if (!c) {
-              this.simpleTxData(msg, {}, { code: 400, msg: `Unsupported VPN client type: ${type}` });
-              return;
+              log.error(`Unsupported VPN client type: ${type}`);
+              continue;
             }
             const profileIds = await c.listProfileIds();
             Array.prototype.push.apply(profiles, await Promise.all(profileIds.map(profileId => new c({ profileId }).getAttributes())));
@@ -3933,7 +3937,7 @@ class netBot extends ControllerBot {
             this.simpleTxData(msg, {}, { code: 400, msg: "dhcpRange.start/end should be set at the same time." }, callback);
             return;
           }
-          const currentConfig = fc.getConfig(true);
+          const currentConfig = await fc.getConfig(true);
           switch (network) {
             case "secondary": {
               const currentSecondaryInterface = currentConfig.secondaryInterface;
@@ -4063,7 +4067,7 @@ class netBot extends ControllerBot {
           if (!network) {
             this.simpleTxData(msg, {}, { code: 400, msg: "network should be specified." }, callback);
           } else {
-            const config = fc.getConfig(true);
+            const config = await fc.getConfig(true);
             let dhcpRange = await dnsTool.getDefaultDhcpRange(network);
             switch (network) {
               case "secondary": {

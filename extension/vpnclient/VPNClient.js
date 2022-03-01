@@ -75,6 +75,13 @@ class VPNClient {
     return instances[profileId];
   }
 
+  static getInstance(profileId) {
+    if (instances.hasOwnProperty(profileId))
+      return instances[profileId];
+    else
+      return null;
+  }
+
   static async getVPNProfilesForInit(json) {
     const types = ["openvpn", "wireguard", "ssl", "zerotier", "trojan", "clash", "ipsec"];
     for (const type of types) {
@@ -709,6 +716,7 @@ class VPNClient {
     await vpnClientEnforcer.destroyRtId(this.getInterfaceName());
     await fs.unlinkAsync(this._getSettingsPath()).catch((err) => {});
     await fs.unlinkAsync(this._getJSONConfigPath()).catch((err) => {});
+    delete instances[this.profileId];
   }
 
   getInterfaceName() {
@@ -763,9 +771,9 @@ class VPNClient {
     });
   }
 
-  async profileExists() {
-    const settingsPath = this._getSettingsPath();
-    return fs.accessAsync(settingsPath, fs.constants.R_OK).then(() => true).catch(() => false);
+  static async profileExists(profileId) {
+    const profileIds = await this.listProfileIds();
+    return profileIds && profileIds.includes(profileId);
   }
 
   static getConfigDirectory() {

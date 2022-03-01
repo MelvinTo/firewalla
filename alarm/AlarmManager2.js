@@ -223,6 +223,7 @@ module.exports = class {
     });
   }
 
+  // ignore IS archive
   async ignoreAlarm(alarmID, info) {
     log.info("Going to ignore alarm " + alarmID);
     const userInput = info.info;

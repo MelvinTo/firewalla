@@ -432,7 +432,7 @@ class DestIPFoundHook extends Hook {
 
       // check if detection should be triggered on this flow/mac immediately to speed up detection
       if(aggrIntelInfo.category === 'intel') {
-        this.shouldTriggerDetectionImmediately(mac);
+        this.shouldTriggerDetectionImmediately(mac, intel);
       }
 
       return aggrIntelInfo;
@@ -443,7 +443,7 @@ class DestIPFoundHook extends Hook {
     }
   }
 
-  shouldTriggerDetectionImmediately(mac) {
+  shouldTriggerDetectionImmediately(mac, intel = {}) {
     if(this.triggerCache.get(mac) !== undefined) {
       // skip if duplicate in 5 minutes
       return;
@@ -451,7 +451,7 @@ class DestIPFoundHook extends Hook {
 
     this.triggerCache.set(mac, 1);
 
-    log.info("Triggering FW_DETECT_REQUEST on mac", mac);
+    log.info("Triggering FW_DETECT_REQUEST on mac", mac, "due to intel:", intel.host || intel.ip, intel.category);
 
     // trigger firemon detect immediately to detect the malware activity sooner
     sem.sendEventToFireMon({

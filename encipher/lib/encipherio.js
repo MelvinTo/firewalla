@@ -935,7 +935,7 @@ let legoEptCloud = class {
             continue;
           }
 
-          const decrypted = self.decrypt(obj.mesasge, key);
+          const decrypted = self.decrypt(obj.message, key);
           if (decrypted === null) {
             messages.push({err: "decrypt_error"});
             continue;

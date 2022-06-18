@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOSS=$(sudo ping -qi 0.2 -s 1400 -c 100 1.1.1.1 | awk -F, '/packet loss/ {print $3}' | sed 's=%.*==g' | sed 's= ==')
+LOSS=$(sudo ping -qi 0.2 -s 1400 -c 200 1.1.1.1 | awk -F, '/packet loss/ {print $3}' | sed 's=%.*==g' | sed 's= ==')
 
 LOSS=${LOSS:="-1"}
 

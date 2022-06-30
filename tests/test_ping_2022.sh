@@ -1,8 +1,8 @@
 #!/bin/bash
 
-LOSS=$(sudo ping -qi 1 -s 1400 -c 100 9.9.9.9 | egrep -o '[0-9]+% packet loss' | sed 's=% packet loss==')
-LOSS2=$(sudo ping -qi 1 -s 1400 -c 100 1.1.1.1 | egrep -o '[0-9]+% packet loss' | sed 's=% packet loss==')
-LOSS3=$(sudo ping -qi 1 -s 1400 -c 100 208.67.222.222 | egrep -o '[0-9]+% packet loss' | sed 's=% packet loss==')
+LOSS=$(sudo ping -qi 1 -s 1400 -c 50 9.9.9.9 | egrep -o '[0-9]+% packet loss' | sed 's=% packet loss==')
+LOSS2=$(sudo ping -qi 1 -s 1400 -c 50 1.1.1.1 | egrep -o '[0-9]+% packet loss' | sed 's=% packet loss==')
+LOSS3=$(sudo ping -qi 1 -s 1400 -c 50 208.67.222.222 | egrep -o '[0-9]+% packet loss' | sed 's=% packet loss==')
 
 LOSS=${LOSS:="-1"}
 LOSS2=${LOSS2:="-1"}

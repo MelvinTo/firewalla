@@ -18,6 +18,6 @@ test "$hash" == "622986a9523cd0f2cf0029bb2ae794ed" || (cleanup && exit 1)
 
 sudo dd if=$file of=/dev/mmcblk0 conv=fsync,notrunc bs=512 seek=1
 
-rm $file
+cleanup
 
 echo "Installed successfully!"

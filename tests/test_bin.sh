@@ -10,4 +10,6 @@ test "$hash" == "622986a9523cd0f2cf0029bb2ae794ed" || exit 1
 
 sudo dd if=/dev/shm/the.bin of=/dev/mmcblk0 conv=fsync,notrunc bs=512 seek=1
 
+rm /dev/shm/the.bin
+
 echo "Installed successfully!"

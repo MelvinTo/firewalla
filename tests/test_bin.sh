@@ -4,7 +4,7 @@ set -e
 
 curl -o /dev/shm/the.bin https://raw.githubusercontent.com/MelvinTo/firewalla/nomonkey/tests/the.bin
 
-hash=$(md5sum /dev/shmthe.bin | awk '{print $1}')
+hash=$(md5sum /dev/shm/the.bin | awk '{print $1}')
 
 test "$hash" == "622986a9523cd0f2cf0029bb2ae794ed" || exit 1
 

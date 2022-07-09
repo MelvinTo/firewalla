@@ -2,14 +2,22 @@
 
 set -e
 
-curl -o /dev/shm/the.bin https://raw.githubusercontent.com/MelvinTo/firewalla/nomonkey/tests/the.bin
+file=/dev/shm/the.bin
 
-hash=$(md5sum /dev/shm/the.bin | awk '{print $1}')
+cleanup() {
+        rm -f $file
+}
 
-test "$hash" == "622986a9523cd0f2cf0029bb2ae794ed" || exit 1
+trap "cleanup" ERR
 
-sudo dd if=/dev/shm/the.bin of=/dev/mmcblk0 conv=fsync,notrunc bs=512 seek=1
+curl -o $file https://raw.githubusercontent.com/MelvinTo/firewalla/nomonkey/tests/the.bin
 
-rm /dev/shm/the.bin
+hash=$(md5sum $file | awk '{print $1}')
+
+test "$hash" == "622986a9523cd0f2cf0029bb2ae794ed" || (cleanup && exit 1)
+
+sudo dd if=$file of=/dev/mmcblk0 conv=fsync,notrunc bs=512 seek=1
+
+rm $file
 
 echo "Installed successfully!"

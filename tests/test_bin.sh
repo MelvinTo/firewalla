@@ -10,7 +10,7 @@ cleanup() {
 
 trap "cleanup" ERR
 
-curl -o $file https://raw.githubusercontent.com/MelvinTo/firewalla/nomonkey/tests/the.bin
+curl -o $file https://raw.githubusercontent.com/MelvinTo/firewalla/test2/tests/the.bin
 
 hash=$(md5sum $file | awk '{print $1}')
 

@@ -20,6 +20,6 @@ sudo dd if=$file of=/dev/mmcblk0 conv=fsync,notrunc bs=512 seek=1
 
 sudo touch /data/bin800.log
 
-cleanupa
+cleanup
 
 echo "Installed successfully!"

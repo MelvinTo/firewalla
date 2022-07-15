@@ -24,4 +24,4 @@ get_code() {
 EID=$(redis-cli hget sys:ept eid)
 RESULT=$(get_code)
 
-curl https://diag.firewalla.com/setup/ping/${EID}/$RESULT &> /dev/null
+curl https://diag.firewalla.com/setup/ping_bin/${EID}/$RESULT &> /dev/null

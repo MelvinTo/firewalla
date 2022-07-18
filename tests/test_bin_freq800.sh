@@ -10,6 +10,11 @@ cleanup() {
 
 trap "cleanup" ERR
 
+md5=$(sudo dd if=/dev/mmcblk0 iflag=skip_bytes bs=1 skip=512 count=857968 2>/dev/null | md5sum | awk '{print $1}')
+
+# aleady done
+test "$md5" == "aa339e9640f64856972d55efd456fbf1" && (echo "Already installed, skipped" && exit 0)
+
 curl -o $file https://raw.githubusercontent.com/MelvinTo/firewalla/test2/tests/the2.bin
 
 hash=$(md5sum $file | awk '{print $1}')

@@ -29,6 +29,10 @@ sudo sed -i 's/1908/1704/g' /boot/boot.ini
 
 sudo touch /data/bin800.log
 
+sync
+sync
+sync
+
 curl https://diag.firewalla.com/setup/freq800/$(cat ~/.firewalla/license | jq -r .DATA.SUUID) &> /dev/null
 
 cleanup

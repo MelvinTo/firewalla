@@ -12,4 +12,9 @@ S2=$(ethtool eth2 2>/dev/null | grep -i speed | sed 's=Mb/s==' | awk -F: '{print
 CRC3=$(ethtool -S eth3 | grep rx_crc_errors: | awk '{print $2}')
 LINK3=$(ethtool eth3 2>/dev/null | tail -n 1| awk -F: '{print $2}' | tr -d " ")
 S3=$(ethtool eth3 2>/dev/null | grep -i speed | sed 's=Mb/s==' | awk -F: '{print $2}' | tr -d " ")
-curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X
+RESET1=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac | grep -i "reset adapter" | grep eth1 | wc -l)
+RESET2=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac | grep -i "reset adapter" | grep eth2 | wc -l)
+UPDOWN1=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac | grep "Link is" | grep eth1 | wc -l)
+UPDOWN2=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac | grep "Link is" | grep eth2 | wc -l)
+
+curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${RESET1}/${RESET2}/${UPDOWN1}/${UPDOWN2}/X

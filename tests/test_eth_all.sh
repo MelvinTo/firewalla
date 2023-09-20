@@ -12,9 +12,17 @@ S2=$(ethtool eth2 2>/dev/null | grep -i speed | sed 's=Mb/s==' | awk -F: '{print
 CRC3=$(ethtool -S eth3 | grep rx_crc_errors: | awk '{print $2}')
 LINK3=$(ethtool eth3 2>/dev/null | tail -n 1| awk -F: '{print $2}' | tr -d " ")
 S3=$(ethtool eth3 2>/dev/null | grep -i speed | sed 's=Mb/s==' | awk -F: '{print $2}' | tr -d " ")
-RESET1=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac -a | grep -i "reset adapter" | grep eth1 | wc -l)
-RESET2=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac -a | grep -i "reset adapter" | grep eth2 | wc -l)
-UPDOWN1=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac -a | grep "Link is" | grep eth1 | wc -l)
-UPDOWN2=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" | grep rk_gmac-dwmac -a | grep "Link is" | grep eth2 | wc -l)
+TXTIMEOUT0=$(cat /sys/class/net/eth0/queues/tx-0/tx_timeout)
+TXTIMEOUT1=$(cat /sys/class/net/eth1/queues/tx-0/tx_timeout)
+TXTIMEOUT2=$(cat /sys/class/net/eth2/queues/tx-0/tx_timeout)
+TXTIMEOUT3=$(cat /sys/class/net/eth3/queues/tx-0/tx_timeout)
+UP0=$(cat /sys/class/net/eth0/carrier_up_count)
+DOWN0=$(cat /sys/class/net/eth0/carrier_down_count)
+UP1=$(cat /sys/class/net/eth1/carrier_up_count)
+DOWN1=$(cat /sys/class/net/eth1/carrier_down_count)
+UP2=$(cat /sys/class/net/eth2/carrier_up_count)
+DOWN2=$(cat /sys/class/net/eth2/carrier_down_count)
+UP3=$(cat /sys/class/net/eth3/carrier_up_count)
+DOWN3=$(cat /sys/class/net/eth3/carrier_down_count)
 
-curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${RESET1}/${RESET2}/${UPDOWN1}/${UPDOWN2}/X
+curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${TXTIMEOUT0}/${TXTIMEOUT1}/${TXTIMEOUT2}/${TXTIMEOUT3}/Y/${UP0}/${DOWN0}/${UP1}/${DOWN1}/${UP2}/${DOWN2}/${UP3}/${DOWN3}/X

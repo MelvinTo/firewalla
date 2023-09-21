@@ -24,5 +24,6 @@ UP2=$(cat /sys/class/net/eth2/carrier_up_count)
 DOWN2=$(cat /sys/class/net/eth2/carrier_down_count)
 UP3=$(cat /sys/class/net/eth3/carrier_up_count)
 DOWN3=$(cat /sys/class/net/eth3/carrier_down_count)
+LOOP=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" 2>/dev/null| grep -a "own address" | wc -l)
 
-curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${TXTIMEOUT0}/${TXTIMEOUT1}/${TXTIMEOUT2}/${TXTIMEOUT3}/Y/${UP0}/${DOWN0}/${UP1}/${DOWN1}/${UP2}/${DOWN2}/${UP3}/${DOWN3}/X
+curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${TXTIMEOUT0}/${TXTIMEOUT1}/${TXTIMEOUT2}/${TXTIMEOUT3}/Y/${UP0}/${DOWN0}/${UP1}/${DOWN1}/${UP2}/${DOWN2}/${UP3}/${DOWN3}/X/${LOOP}/Z

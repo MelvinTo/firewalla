@@ -25,5 +25,9 @@ DOWN2=$(cat /sys/class/net/eth2/carrier_down_count)
 UP3=$(cat /sys/class/net/eth3/carrier_up_count)
 DOWN3=$(cat /sys/class/net/eth3/carrier_down_count)
 LOOP=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" 2>/dev/null| grep -a "own address" | wc -l)
+LINKDOWN0=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" 2>/dev/null| grep -a "eth0: link down" | wc -l)
+LINKDOWN1=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" 2>/dev/null| grep -a "eth1: link is Down" -i | wc -l)
+LINKDOWN2=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" 2>/dev/null| grep -a "eth2: link is Down" -i | wc -l)
+LINKDOWN3=$(sudo bash -c "cd /var/log; cat kern.log kern.log.1; zcat kern.log*.gz" 2>/dev/null| grep -a "eth3: link down" | wc -l)
 
-curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${TXTIMEOUT0}/${TXTIMEOUT1}/${TXTIMEOUT2}/${TXTIMEOUT3}/Y/${UP0}/${DOWN0}/${UP1}/${DOWN1}/${UP2}/${DOWN2}/${UP3}/${DOWN3}/X/${LOOP}/Z
+curl https://diag.firewalla.com/setup/crc_eth_all/${EID}/${CRC0}/${CRC1}/${CRC2}/${CRC3}/${LINK0}/${LINK1}/${LINK2}/${LINK3}/${S0}/${S1}/${S2}/${S3}/X/${TXTIMEOUT0}/${TXTIMEOUT1}/${TXTIMEOUT2}/${TXTIMEOUT3}/Y/${UP0}/${DOWN0}/${UP1}/${DOWN1}/${UP2}/${DOWN2}/${UP3}/${DOWN3}/X/${LOOP}/Z/${LINKDOWN0}/${LINKDOWN1}/${LINKDOWN2}/${LINKDOWN3}/ZZ

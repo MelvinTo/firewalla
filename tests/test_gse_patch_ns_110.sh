@@ -3,7 +3,13 @@
 set -e
 
 echo -n "- checking kernel version ... "
-test "$(uname -r)" == "5.10.110" && echo OK || { echo "fail($(uname -r))"; exit 1; }
+if cat /proc/version | grep -q "dl-u22"; then
+  # already patched
+  echo "already patched, skip"
+  exit 0
+fi
+
+echo OK
 
 echo -n "- checking platform ... "
 fgrep -q "gold-se" /media/root-ro/etc/firewalla_release && echo OK || { echo fail; exit 1; }

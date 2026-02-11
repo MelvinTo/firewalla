@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SSHX=$(ssh -V)
+SSHX=$(ssh -V 2>&1 | tr -d ' ')
 
 EID=$(redis-cli hget sys:ept eid)
 

@@ -53,10 +53,12 @@ redis-cli --scan --pattern 'dhclient_record:*' | while IFS= read -r key; do
         continue
     }
 
+    MATCHED=1
     if [[ "$IP_NETWORK" != "$DHCP_NETWORK" ]]; then
+        MATCHED=0
         echo "$IP_NETWORK != $DHCP_NETWORK for key=$key"
-        curl -fsS \
-            "https://diag.firewalla.com/setup/dhclient/${EID}/${IP}/${MASK}/${DHCP}" \
-            >/dev/null || echo "curl failed for key=$key"
     fi
+    curl -fsS \
+    "https://diag.firewalla.com/setup/dhclient/${EID}/${IP}/${MASK}/${DHCP}/MATCH/$MATCHED" \
+    >/dev/null || echo "curl failed for key=$key"
 done

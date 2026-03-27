@@ -10,6 +10,12 @@ if fgrep -q 'NETWORK_CHECK_URL=https://1.1.1.1' $file; then
           return_code=1
 fi
 
+if [[ $return_code -eq 0 ]]; then
+  /home/pi/firerouter/scripts/firerouter_upgrade_check.sh
+  sleep 15
+  sudo systemctl restart firemain
+fi
+
 
 EID=$(redis-cli --raw hget sys:ept eid)
 

@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
-sed -i 's|NETWORK_CHECK_URL=https://1.1.1.1|NETWORK_CHECK_URL=https://one.one.one.one|' /home/pi/firerouter/scripts/firerouter_upgrade.sh
+return_code=0
+file=/home/pi/firerouter/scripts/firerouter_upgrade.sh
 
-return_code=$?
+if fgrep -q 'NETWORK_CHECK_URL=https://1.1.1.1' $file; then
+          sed -i 's|NETWORK_CHECK_URL=https://1.1.1.1|NETWORK_CHECK_URL=https://one.one.one.one|' $file
+          return_code=0
+    else
+          return_code=1
+fi
+
 
 EID=$(redis-cli --raw hget sys:ept eid)
 

@@ -1,5 +1,6 @@
 #!/bin/bash
-ext_csd_path=${1:-/sys/kernel/debug/mmc0/mmc0:0001/ext_csd}
+ext_csd_path=${1:-/sys/kernel/debug/mmc*/mmc*/ext_csd}
+ext_csd_path=$(ls -1 $ext_csd_path)
 
 if ! sudo test -r "$ext_csd_path"; then
   echo "error: cannot read $ext_csd_path" >&2

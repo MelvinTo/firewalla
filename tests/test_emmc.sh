@@ -7,13 +7,20 @@ if ! sudo test -r "$ext_csd_path"; then
   exit 1
 fi
 
-EMMC=$(sudo cat "$ext_csd_path" \
+# JEDEC eMMC 5.x ext_csd offsets:
+#   267 = PRE_EOL_INFO                  (1=normal, 2=warning, 3=urgent)
+#   268 = DEVICE_LIFE_TIME_EST_TYP_A    (1..10 = 0-10..90-100% used, 11 = exceeded)
+#   269 = DEVICE_LIFE_TIME_EST_TYP_B
+HEX=$(sudo cat "$ext_csd_path" \
   | grep -Eo '([0-9a-fA-F]{2})' \
   | tr -d '\n' \
   | xxd -r -p \
-  | dd bs=1 skip=268 count=2 2>/dev/null \
-  | xxd -p -c 2)
+  | dd bs=1 skip=267 count=3 2>/dev/null \
+  | xxd -p -c 3)
+
+EOL=${HEX:0:2}     # byte 267
+EMMC=${HEX:2:4}    # bytes 268+269, unchanged 4-char contract
 
 EID=$(redis-cli hget sys:ept eid)
 
-curl https://diag.firewalla.com/setup/emmc/${EID}/${EMMC} &> /dev/null
+curl https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL} &> /dev/null

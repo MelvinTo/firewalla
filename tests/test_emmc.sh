@@ -22,6 +22,7 @@ EOL=${HEX:0:2}     # byte 267
 EMMC=${HEX:2:4}    # bytes 268+269, unchanged 4-char contract
 
 REDIS_MEM=$(redis-cli info memory | grep -i used_memory: | awk -F: '{print $2}' | tr -d '\r\n')
+REDIS_DB_SIZE=$(ls -l /data/redis/dump.rdb | awk '{print $5}' | tr -d '\r\n')
 EID=$(redis-cli hget sys:ept eid)
 
-curl https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}/${REDIS_MEM} &> /dev/null
+curl https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}/${REDIS_MEM}/${REDIS_DB_SIZE} &> /dev/null

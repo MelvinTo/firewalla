@@ -21,10 +21,10 @@ HEX=$(sudo cat "$ext_csd_path" \
 EOL=${HEX:0:2}
 EMMC=${HEX:2:4}
 
-# Locate the eMMC block device (mmcblk0/1/2/3): pick the one with p14 partition.
+# Locate the eMMC block device (mmcblk0/1/2/3): pick the one with p8 partition.
 DEV=""
 for n in 0 1 2 3; do
-  if [[ -e "/sys/block/mmcblk${n}/mmcblk${n}p14" ]]; then
+  if [[ -e "/sys/block/mmcblk${n}/mmcblk${n}p8" ]]; then
     DEV="mmcblk${n}"
     break
   fi
@@ -34,9 +34,9 @@ done
 get_w() { awk -v d="$1" '$3==d {print $10; exit}' /proc/diskstats; }
 
 TW=$(get_w "$DEV")
-W12=$(get_w "${DEV}p12")
-W13=$(get_w "${DEV}p13")
-W14=$(get_w "${DEV}p14")
+W6=$(get_w "${DEV}p6")
+W7=$(get_w "${DEV}p7")
+W8=$(get_w "${DEV}p8")
 
 # System uptime in whole seconds (/proc/uptime field 1)
 UP=$(cut -d. -f1 /proc/uptime)
@@ -46,4 +46,4 @@ TEMP=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null)
 
 EID=$(redis-cli hget sys:ept eid)
 
-curl "https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}?tw=${TW}&w12=${W12}&w13=${W13}&w14=${W14}&up=${UP}&t=${TEMP}" &> /dev/null
+curl "https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}?tw=${TW}&w6=${W6}&w7=${W7}&w8=${W8}&up=${UP}&t=${TEMP}" &> /dev/null

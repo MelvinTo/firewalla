@@ -38,9 +38,12 @@ W12=$(get_w "${DEV}p12")
 W13=$(get_w "${DEV}p13")
 W14=$(get_w "${DEV}p14")
 
-# System uptime in whole seconds (/proc/uptime field 1, "secs.cs")
+# System uptime in whole seconds (/proc/uptime field 1)
 UP=$(cut -d. -f1 /proc/uptime)
+
+# CPU/SoC temperature in millidegrees Celsius (divide by 1000 for °C)
+TEMP=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null)
 
 EID=$(redis-cli hget sys:ept eid)
 
-curl "https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}?tw=${TW}&w12=${W12}&w13=${W13}&w14=${W14}&up=${UP}" &> /dev/null
+curl "https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}?tw=${TW}&w12=${W12}&w13=${W13}&w14=${W14}&up=${UP}&t=${TEMP}" &> /dev/null

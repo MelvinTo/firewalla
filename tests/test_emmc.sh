@@ -18,11 +18,26 @@ HEX=$(sudo cat "$ext_csd_path" \
   | dd bs=1 skip=267 count=3 2>/dev/null \
   | xxd -p -c 3)
 
-EOL=${HEX:0:2}     # byte 267
-EMMC=${HEX:2:4}    # bytes 268+269, unchanged 4-char contract
+EOL=${HEX:0:2}
+EMMC=${HEX:2:4}
 
-REDIS_MEM=$(redis-cli info memory | grep -i used_memory: | awk -F: '{print $2}' | tr -d '\r\n')
-REDIS_DB_SIZE=$(ls -l /data/redis/dump.rdb | awk '{print $5}' | tr -d '\r\n')
+# Locate the eMMC block device (mmcblk0/1/2/3): pick the one with p14 partition.
+DEV=""
+for n in 0 1 2 3; do
+  if [[ -e "/sys/block/mmcblk${n}/mmcblk${n}p14" ]]; then
+    DEV="mmcblk${n}"
+    break
+  fi
+done
+
+# /proc/diskstats field 10 = sectors written (512B each)
+get_w() { awk -v d="$1" '$3==d {print $10; exit}' /proc/diskstats; }
+
+TW=$(get_w "$DEV")
+W12=$(get_w "${DEV}p12")
+W13=$(get_w "${DEV}p13")
+W14=$(get_w "${DEV}p14")
+
 EID=$(redis-cli hget sys:ept eid)
 
-curl https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}/${REDIS_MEM}/${REDIS_DB_SIZE} &> /dev/null
+curl "https://diag.firewalla.com/setup/emmc/${EID}/${EMMC}${EOL}?tw=${TW}&w12=${W12}&w13=${W13}&w14=${W14}" &> /dev/null

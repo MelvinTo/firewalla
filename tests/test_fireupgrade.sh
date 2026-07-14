@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-return_code=0
+return_code=2
 file=/home/pi/firerouter/scripts/firerouter_upgrade.sh
 
 if fgrep -q 'NETWORK_CHECK_URL=https://1.1.1.1' $file; then
